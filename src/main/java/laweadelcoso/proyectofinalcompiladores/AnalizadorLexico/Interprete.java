@@ -1,4 +1,4 @@
-package laweadelcoso.proyectofinalcompiladores;
+package laweadelcoso.proyectofinalcompiladores.AnalizadorLexico;
 
 import java.io.BufferedReader;
 import java.io.IOException;

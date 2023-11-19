@@ -1,4 +1,4 @@
-package laweadelcoso.proyectofinalcompiladores;
+package laweadelcoso.proyectofinalcompiladores.AnalizadorLexico;
 
 // Enumeración que define los tipos de tokens posibles
 public enum TipoToken {

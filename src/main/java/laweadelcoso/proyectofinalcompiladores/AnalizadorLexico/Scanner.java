@@ -1,10 +1,11 @@
-package laweadelcoso.proyectofinalcompiladores;
+package laweadelcoso.proyectofinalcompiladores.AnalizadorLexico;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static laweadelcoso.proyectofinalcompiladores.Interprete.error;
+
+import static laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.error;
 
 /*
 
