@@ -1,5 +1,6 @@
 package laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.TipoToken;
@@ -37,630 +38,766 @@ public class ASDR implements Parser{
     }
 
     //PROGRAM -> DECLARATION
-    private void PROGRAM() {
+    private List<Statement> PROGRAM() {
+
+        List<Statement> stmts = new ArrayList<>();
 
         if(hayErrores)
-            return;
+            return null;
 
-        DECLARATION();
+        return DECLARATION(stmts);
 
     }
 
     /*Declaraciones*/
     //DECLARATION -> FUN_DECL DECLARATION || VAR_DECL DECLARATION || STATEMENT DECLARATION || EMPTY
-    private void DECLARATION() {
+    private List<Statement> DECLARATION(List<Statement> stmts) {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.FUN){
-            FUN_DECL();
-            DECLARATION();
+            Statement statement = FUN_DECL();
+            stmts.add(statement);
+            return DECLARATION(stmts);
         } else if(preanalisis.getTipo() == TipoToken.VAR){
-            VAR_DECL();
-            DECLARATION();
+            Statement statement = VAR_DECL();
+            stmts.add(statement);
+            return DECLARATION(stmts);
         } else if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN || preanalisis.getTipo() ==TipoToken.PRINT
                 || preanalisis.getTipo() == TipoToken.FOR || preanalisis.getTipo() == TipoToken.IF || preanalisis.getTipo() == TipoToken.RETURN || preanalisis.getTipo() == TipoToken.WHILE || preanalisis.getTipo() == TipoToken.LEFT_BRACE){
-            STATEMENT();
-            DECLARATION();
+            Statement statement = STATEMENT();
+            stmts.add(statement);
+            return DECLARATION(stmts);
         }
+
+        return stmts;
 
     }
 
     //FUN_DECL -> fun FUNCTION
-    private void FUN_DECL() {
+    private Statement FUN_DECL() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.FUN){
             match(TipoToken.FUN);
-            FUNCTION();
-        } else
+            return FUNCTION();
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //VAR_DECL -> var id VAR_INIT ;
-    private void VAR_DECL() {
+    private Statement VAR_DECL() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.VAR){
             match(TipoToken.VAR);
             match(TipoToken.IDENTIFIER);
-            VAR_INIT();
+            Token name = previous();
+            Expression init = VAR_INIT();
             match(TipoToken.SEMICOLON);
-        } else
+            return new StmtVar(name,init);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
-    //VAR_INIT -> = EXPRESSION
-    private void VAR_INIT() {
+    //VAR_INIT -> = EXPRESSION || EMPTY
+    private Expression VAR_INIT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
+            return EXPRESSION();
         }
+
+        return null;
 
     }
 
     /*Sentencias*/
     //STATEMENT -> EXPR_STMT || FOR_STMT || IF_STMT || PRINT_STMT || RETURN_STMT || WHILE_STMT || BLOCK
-    private void STATEMENT() {
+    private Statement STATEMENT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            EXPR_STMT();
+            return EXPR_STMT();
         } else if (preanalisis.getTipo() == TipoToken.FOR){
-            FOR_STMT();
+            return FOR_STMT();
         } else if(preanalisis.getTipo() == TipoToken.IF){
-            IF_STMT();
+            return IF_STMT();
         } else if (preanalisis.getTipo() == TipoToken.PRINT){
-            PRINT_STMT();
+            return PRINT_STMT();
         } else if(preanalisis.getTipo() == TipoToken.RETURN){
-            RETURN_STMT();
+            return RETURN_STMT();
         } else if (preanalisis.getTipo() == TipoToken.WHILE){
-            WHILE_STMT();
+            return WHILE_STMT();
         } else if (preanalisis.getTipo() == TipoToken.LEFT_BRACE){
-            BLOCK();
-        } else
+            return BLOCK();
+        } else{
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //EXPR_STMT -> EXPRESSION ;
-    private void EXPR_STMT() {
+    private Statement EXPR_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            EXPRESSION();
+            Expression expr = EXPRESSION();
             match(TipoToken.SEMICOLON);
-        } else
+            return new StmtExpression(expr);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FOR_STMT -> for ( FOR_STMT_1 FOR_STMT_2 FOR_STMT_3 ) STATEMENT
-    private void FOR_STMT() {
+    private Statement FOR_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.FOR){
-
             match(TipoToken.FOR);
             match(TipoToken.LEFT_PAREN);
-            FOR_STMT_1();
-            FOR_STMT_2();
-            FOR_STMT_3();
+            Statement init = FOR_STMT_1();
+            Expression con = FOR_STMT_2();
+            Expression inc = FOR_STMT_3();
             match(TipoToken.RIGHT_PAREN);
-            STATEMENT();
-
-        } else
+            Statement body = STATEMENT();
+            return new StmtLoopFor(init,con,inc,body);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FOR_STMT_1 -> VAR_DECL || EXPR_STMT || ;
-    private void FOR_STMT_1() {
+    private Statement FOR_STMT_1() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.VAR){
-            VAR_DECL();
+            return VAR_DECL();
         } else if (preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            EXPR_STMT();
+            return EXPR_STMT();
         } else if(preanalisis.getTipo() == TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
-        } else
+            return null;
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FOR_STMT_2 -> EXPRESSION; || ;
-    private void FOR_STMT_2() {
+    private Expression FOR_STMT_2() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            EXPRESSION();
+            Expression expr = EXPRESSION();
             match(TipoToken.SEMICOLON);
+            return expr;
         } else if(preanalisis.getTipo() == TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
-        } else
+            return null;
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FOR_STMT_3 -> EXPRESSION || EMPTY
-    private void FOR_STMT_3() {
+    private Expression FOR_STMT_3() {
 
         if(hayErrores)
-            return;
+            return null;
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN)
-            EXPRESSION();
+            return EXPRESSION();
 
 
+        return null;
     }
 
     //IF_STMT -> if (EXPRESSION) STATEMENT ELSE_STATEMENT
-    private void IF_STMT() {
+    private Statement IF_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.IF){
             match(TipoToken.IF);
             match(TipoToken.LEFT_PAREN);
-            EXPRESSION();
+            Expression condition = EXPRESSION();
             match(TipoToken.RIGHT_PAREN);
-            STATEMENT();
-            ELSE_STMT();
-        } else
+            Statement thenBranch = STATEMENT();
+            Statement elseBranch = ELSE_STMT();
+            return new StmtIf(condition,thenBranch,elseBranch);
+        } else{
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //ELSE_STATEMENT -> else STATEMENT || EMPTY
-    private void ELSE_STMT() {
+    private Statement ELSE_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.ELSE){
             match(TipoToken.ELSE);
-            STATEMENT();
+            return STATEMENT();
         }
+        return null;
 
     }
 
     //PRINT_STMT -> print EXPRESSION ;
-    private void PRINT_STMT() {
+    private Statement PRINT_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.PRINT){
             match(TipoToken.PRINT);
-            EXPRESSION();
+            StmtPrint stmtprint = new StmtPrint(EXPRESSION());
             match(TipoToken.SEMICOLON);
-        } else
+            return stmtprint;
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //RETURN_STMT -> return RETURN_EXP_OPC ;
-    private void RETURN_STMT() {
+    private Statement RETURN_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.RETURN){
             match(TipoToken.RETURN);
-            RETURN_EXP_OPC();
+            Expression expr = RETURN_EXP_OPC();
             match(TipoToken.SEMICOLON);
-        } else
+            return new StmtReturn(expr);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //RETURN_EXP_OPC -> EXPRESSION || EMPTY
-    private void RETURN_EXP_OPC() {
+    private Expression RETURN_EXP_OPC() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if (preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN)
-            EXPRESSION();
+            return EXPRESSION();
 
+        return null;
     }
 
     //WHILE_STMT -> while ( EXPRESSION ) STATEMENT
-    private void WHILE_STMT() {
+    private Statement WHILE_STMT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.WHILE) {
             match(TipoToken.WHILE);
             match(TipoToken.LEFT_PAREN);
-            EXPRESSION();
+            Expression condition = EXPRESSION();
             match(TipoToken.RIGHT_PAREN);
-            STATEMENT();
+            Statement body = STATEMENT();
+            return new StmtLoop(condition,body);
         }
-        else
+        else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //BLOCK -> { DECLARATION }
-    private void BLOCK() {
+    private Statement BLOCK() {
 
         if(hayErrores)
-            return;
+            return null;
+
         if(preanalisis.getTipo() == TipoToken.LEFT_BRACE){
             match(TipoToken.LEFT_BRACE);
-            DECLARATION();
+            List<Statement> statements = new ArrayList<>();
+            Statement block = new StmtBlock(DECLARATION(statements));
             match(TipoToken.RIGHT_BRACE);
-        } else
+            return block;
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     /*Expresiones*/
     //EXPRESSION -> ASSIGNMENT
-    private void EXPRESSION() {
+    private Expression EXPRESSION() {
 
         if(hayErrores)
-            return;
+            return null;
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            ASSIGNMENT();
-        } else
+            return ASSIGNMENT();
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //ASSIGNMENT -> LOGIC_OR ASSIGNMENT_OPC
-    private void ASSIGNMENT() {
+    private Expression ASSIGNMENT() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            LOGIC_OR();
-            ASSIGNMENT_OPC();
-        } else
+            return ASSIGNMENT_OPC(LOGIC_OR());
+        } else {
             hayErrores = true;
-
-
+            return null;
+        }
     }
 
     //ASSIGNMENT_OPC -> = EXPRESSION || EMPTY
-    private void ASSIGNMENT_OPC() {
+    private Expression ASSIGNMENT_OPC(Expression expr) {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
+            Token name = previous();
+            Expression val = EXPRESSION();
+            return new ExprAssign(name,val);
         }
+
+        return expr;
 
     }
 
     //LOGIC_OR -> LOGIC_AND LOGIC_OR_2
-    private void LOGIC_OR() {
+    private Expression LOGIC_OR() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            LOGIC_AND();
-            LOGIC_OR_2();
-        } else
+            return LOGIC_OR_2(LOGIC_AND());
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //LOGIC_OR_2 -> or LOGIC_AND LOGIC_OR_2 || EMPTY
-    private void LOGIC_OR_2() {
+    private Expression LOGIC_OR_2(Expression expr) {
 
         if(hayErrores)
-            return;
+            return null;
+
         if(preanalisis.getTipo() == TipoToken.OR){
             match(TipoToken.OR);
-            LOGIC_AND();
-            LOGIC_OR_2();
+            Token operator = previous();
+            Expression expr2 = LOGIC_AND();
+            ExprLogical exprLogical = new ExprLogical(expr,operator,expr2);
+            LOGIC_OR_2(exprLogical);
         }
+
+        return expr;
 
     }
 
     //LOGIC_AND -> EQUALITY LOGIC_AND_2
-    private void LOGIC_AND() {
+    private Expression LOGIC_AND() {
 
         if(hayErrores)
-            return;
+            return null;
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            EQUALITY();
-            LOGIC_AND_2();
+            return LOGIC_AND_2(EQUALITY());
         }
-        else
+        else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //LOGIC_AND_2 -> and EQUALITY LOGIC_AND_2 || EMPTY
-    private void LOGIC_AND_2() {
+    private Expression LOGIC_AND_2(Expression expr) {
 
         if(hayErrores)
-            return;
+            return null;
         if(preanalisis.getTipo() == TipoToken.AND){
             match(TipoToken.AND);
-            EQUALITY();
-            LOGIC_AND_2();
+            Token operator = previous();
+            Expression expr2 = EQUALITY();
+            ExprLogical exprLogical = new ExprLogical(expr,operator,expr2);
+            LOGIC_AND_2(exprLogical);
         }
+
+        return expr;
 
     }
 
     //EQUALITY -> COMPARISON EQUALITY_2
-    private void EQUALITY() {
+    private Expression EQUALITY() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            COMPARISON();
-            EQUALITY_2();
-        } else
+            return EQUALITY_2(COMPARISON());
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //EQUALITY_2 -> != COMPARISON EQUALITY_2 || == COMPARISON EQUALITY_2 || EMPTY
-    private void EQUALITY_2() {
+    private Expression EQUALITY_2(Expression expr) {
+
+        Token operator;
+        Expression expr2;
+        ExprBinary exprBinary;
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG_EQUAL){
             match(TipoToken.BANG_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
+            operator = previous();
+            expr2 = COMPARISON();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            return EQUALITY_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.EQUAL_EQUAL){
             match(TipoToken.EQUAL_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
+            operator = previous();
+            expr2 = COMPARISON();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            return EQUALITY_2(exprBinary);
         }
+
+        return expr;
 
     }
 
     //COMPARISON -> TERM COMPARISON_2
-    private void COMPARISON() {
+    private Expression COMPARISON() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            TERM();
-            COMPARISON_2();
-        } else
+            return COMPARISON_2(TERM());
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //COMPARISON_2 -> > TERM COMPARISON_2 || >= TERM COMPARISON_2 || < TERM COMPARISON_2 || <= TERM COMPARISON_2 || EMPTY
-    private void COMPARISON_2() {
+    private Expression COMPARISON_2(Expression expr) {
+
+        Token operator;
+        Expression expr2;
+        ExprBinary exprBinary;
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.GREATER){
             match(TipoToken.GREATER);
-            TERM();
-            COMPARISON_2();
+            operator = previous();
+            expr2 = TERM();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.GREATER_EQUAL){
             match(TipoToken.GREATER_EQUAL);
-            TERM();
-            COMPARISON_2();
+            operator = previous();
+            expr2 = TERM();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.LESS){
             match(TipoToken.LESS);
-            TERM();
-            COMPARISON_2();
+            operator = previous();
+            expr2 = TERM();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.LESS_EQUAL){
             match(TipoToken.LESS_EQUAL);
-            TERM();
-            COMPARISON_2();
+            operator = previous();
+            expr2 = TERM();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            COMPARISON_2(exprBinary);
         }
+
+        return expr;
 
     }
 
     //TERM -> FACTOR TERM_2
-    private void TERM() {
+    private Expression TERM() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            FACTOR();
-            TERM_2();
-        } else
+            return TERM_2(FACTOR());
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //TERM_2 -> - FACTOR TERM_2 || + FACTOR TERM_2 || EMPTY
-    private void TERM_2() {
+    private Expression TERM_2(Expression expr) {
+
+        Token operator;
+        Expression expr2;
+        ExprBinary exprBinary;
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.MINUS){
             match(TipoToken.MINUS);
-            FACTOR();
-            TERM_2();
+            operator = previous();
+            expr2 = FACTOR();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            TERM_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.PLUS){
             match(TipoToken.PLUS);
-            FACTOR();
-            TERM_2();
+            operator = previous();
+            expr2 = FACTOR();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            TERM_2(exprBinary);
         }
+
+        return expr;
 
     }
 
     //FACTOR -> UNARY FACTOR_2
-    private void FACTOR() {
+    private Expression FACTOR() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            UNARY();
-            FACTOR_2();
-        } else
+            return FACTOR_2(UNARY());
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FACTOR_2 -> / UNARY FACTOR_2 || * UNARY FACTOR_2 || EMPTY
-    private void FACTOR_2() {
+    private Expression FACTOR_2(Expression expr) {
+
+        Token operator;
+        Expression expr2;
+        ExprBinary exprBinary;
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.SLASH){
             match(TipoToken.SLASH);
-            UNARY();
-            FACTOR_2();
+            operator = previous();
+            expr2 = UNARY();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            FACTOR_2(exprBinary);
         } else if (preanalisis.getTipo() == TipoToken.STAR) {
             match(TipoToken.STAR);
-            UNARY();
-            FACTOR_2();
+            operator = previous();
+            expr2 = UNARY();
+            exprBinary = new ExprBinary(expr,operator,expr2);
+            FACTOR_2(exprBinary);
         }
+
+        return expr;
 
     }
 
     //UNARY -> ! UNARY || - UNARY || CALL
-    private void UNARY() {
+    private Expression UNARY() {
+
+        Token operator;
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG){
             match(TipoToken.BANG);
-            UNARY();
+            operator = previous();
+            return new ExprUnary(operator,UNARY());
         } else if (preanalisis.getTipo() == TipoToken.MINUS) {
             match(TipoToken.MINUS);
-            UNARY();
+            operator = previous();
+            return new ExprUnary(operator,UNARY());
         } else if(preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            CALL();
-        } else
+            return CALL();
+        } else {
             hayErrores = true;
-
-    }
-
-    //CALL -> PRIMARY CALL_2
-    private void CALL() {
-
-        if(hayErrores)
-            return;
-
-        if(preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
-                || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            PRIMARY();
-            CALL_2();
-        } else
-            hayErrores = true;
-
-    }
-
-    //CALL_2 -> ( ARGUMENTS_OPC ) CALL_2 || EMPTY
-    private void CALL_2() {
-
-        if(hayErrores)
-            return;
-        if(preanalisis.getTipo() == TipoToken.LEFT_PAREN){
-            match(TipoToken.LEFT_PAREN);
-            ARGUMENTS_OPC();
-            match(TipoToken.RIGHT_PAREN);
-            CALL_2();
+            return null;
         }
 
     }
 
-    //PRIMARY -> true || false || null || number || string || id || ( EXPRESSION )
-    private void PRIMARY() {
+    //CALL -> PRIMARY CALL_2
+    private Expression CALL() {
 
         if(hayErrores)
-            return;
+            return null;
+
+        if(preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
+                || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN){
+            return CALL_2(PRIMARY());
+        } else {
+            hayErrores = true;
+            return null;
+        }
+
+    }
+
+    //CALL_2 -> ( ARGUMENTS_OPC ) CALL_2 || EMPTY
+    private Expression CALL_2(Expression expr) {
+
+        if(hayErrores)
+            return null;
+
+        if(preanalisis.getTipo() == TipoToken.LEFT_PAREN){
+            match(TipoToken.LEFT_PAREN);
+            List<Expression> args = ARGUMENTS_OPC();
+            match(TipoToken.RIGHT_PAREN);
+            CALL_2(new ExprCallFunction(expr, args));
+        }
+
+        return expr;
+
+    }
+
+    //PRIMARY -> true || false || null || number || string || id || ( EXPRESSION )
+    private Expression PRIMARY() {
+
+        if(hayErrores)
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.TRUE){
             match(TipoToken.TRUE);
+            return new ExprLiteral(true);
         } else if(preanalisis.getTipo() == TipoToken.FALSE){
             match(TipoToken.FALSE);
+            return new ExprLiteral(false);
         } else if(preanalisis.getTipo() == TipoToken.NULL){
             match(TipoToken.NULL);
+            return new ExprLiteral(null);
         } else if(preanalisis.getTipo() == TipoToken.NUMBER){
             match(TipoToken.NUMBER);
+            return new ExprLiteral(previous().getLiteral());
         } else if(preanalisis.getTipo() == TipoToken.STRING){
             match(TipoToken.STRING);
+            return new ExprLiteral(previous().getLiteral());
         } else if(preanalisis.getTipo() == TipoToken.IDENTIFIER){
             match(TipoToken.IDENTIFIER);
+            return new ExprVariable(previous());
         } else if(preanalisis.getTipo() == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
-            EXPRESSION();
+            Expression expr = EXPRESSION();
             match(TipoToken.RIGHT_PAREN);
-        } else
+            return new ExprGrouping(expr);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
 
     /*Otros*/
     //FUNCTION -> id ( PARAMETERS_OPC ) BLOCK
-    private void FUNCTION() {
+    private Statement FUNCTION() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.IDENTIFIER) {
             match(TipoToken.IDENTIFIER);
+            Token name = previous();
             match(TipoToken.LEFT_PAREN);
-            PARAMETERS_OPC();
+            List<Token> params = PARAMETERS_OPC();
             match(TipoToken.RIGHT_PAREN);
-            BLOCK();
-        } else
+            StmtBlock body = (StmtBlock) BLOCK();
+            return new StmtFunction(name,params,body);
+        } else {
             hayErrores = true;
+            return null;
+        }
 
     }
 
     //FUNCTIONS -> FUN_DECL FUNCTIONS || EMPTY
+    /*Ni idea de para qué sea esta, no la llama nadie nunca, así que por el momento se queda así, toda bonita, toda inutil*/
     private void FUNCTIONS() {
 
         if(hayErrores)
@@ -674,33 +811,39 @@ public class ASDR implements Parser{
     }
 
     //PARAMETERS_OPC -> PARAMETERS || EMPTY
-    private void PARAMETERS_OPC() {
+    private List<Token> PARAMETERS_OPC() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.IDENTIFIER){
-            PARAMETERS();
+            return PARAMETERS();
+        }
+
+        return null;
+    }
+
+    //PARAMETERS -> id PARAMETERS_2
+    private List<Token> PARAMETERS() {
+
+        if(hayErrores)
+            return null;
+
+        if(preanalisis.getTipo() == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            List<Token> lstparam = new ArrayList<>();
+            lstparam.add(previous());
+            PARAMETERS_2(lstparam);
+            return lstparam;
+        } else {
+            hayErrores = true;
+            return null;
         }
 
     }
 
-    //PARAMETERS -> id PARAMETERS_2
-    private void PARAMETERS() {
-
-        if(hayErrores)
-            return;
-
-        if(preanalisis.getTipo() == TipoToken.IDENTIFIER){
-            match(TipoToken.IDENTIFIER);
-            PARAMETERS_2();
-        } else
-            hayErrores = true;
-
-    }
-
     //PARAMETERS_2 -> , id PARAMETERS_2 || EMPTY
-    private void PARAMETERS_2() {
+    private void PARAMETERS_2(List<Token> lstparam) {
 
         if(hayErrores)
             return;
@@ -708,35 +851,42 @@ public class ASDR implements Parser{
         if(preanalisis.getTipo() == TipoToken.COMMA){
             match(TipoToken.COMMA);
             match(TipoToken.IDENTIFIER);
-            PARAMETERS_2();
+            lstparam.add(previous());
+            PARAMETERS_2(lstparam);
         }
 
     }
 
     //ARGUMENTS_OPC -> EXPRESSION ARGUMENTS || EMPTY
-    private void ARGUMENTS_OPC() {
+    private List<Expression> ARGUMENTS_OPC() {
 
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.getTipo() == TipoToken.BANG || preanalisis.getTipo() == TipoToken.MINUS || preanalisis.getTipo() == TipoToken.FALSE || preanalisis.getTipo() == TipoToken.TRUE|| preanalisis.getTipo() == TipoToken.NULL
                 || preanalisis.getTipo() == TipoToken.NUMBER || preanalisis.getTipo() == TipoToken.STRING || preanalisis.getTipo() == TipoToken.IDENTIFIER || preanalisis.getTipo() == TipoToken.LEFT_PAREN) {
-            EXPRESSION();
-            ARGUMENTS();
+            List<Expression> lstargs = new ArrayList<>();
+            Expression expr = EXPRESSION();
+            lstargs.add(expr);
+            ARGUMENTS(lstargs);
+            return lstargs;
         }
+
+        return null;
 
     }
 
     //ARGUMENTS -> , EXPRESSION ARGUMENTS || EMPTY
-    private void ARGUMENTS() {
+    private void ARGUMENTS(List<Expression> lstArgs) {
 
         if(hayErrores)
             return;
 
         if(preanalisis.getTipo() == TipoToken.COMMA){
             match(TipoToken.COMMA);
-            EXPRESSION();
-            ARGUMENTS();
+            Expression expr = EXPRESSION();
+            lstArgs.add(expr);
+            ARGUMENTS(lstArgs);
         }
 
     }
@@ -747,7 +897,6 @@ public class ASDR implements Parser{
             preanalisis = tokens.get(i);
         }else
             hayErrores = true;
-
     }
 
     private Token previous(){

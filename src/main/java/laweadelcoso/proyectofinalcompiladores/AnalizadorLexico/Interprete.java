@@ -1,5 +1,7 @@
 package laweadelcoso.proyectofinalcompiladores.AnalizadorLexico;
 
+import laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ASDR;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,6 +81,10 @@ public class Interprete {
             for (Token token : tokens) {
                 System.out.println(token);
             }
+
+            //El analizador sintactico
+            ASDR asdr = new ASDR(tokens);
+            asdr.parse();
             
         } catch (Exception ex) {
             ex.printStackTrace(); // Imprime la traza de la excepción en caso de error
