@@ -81,7 +81,7 @@ public class Scanner {
 
     public List<Token> scan() throws Exception {
 
-        int estado = 0, linea = 0;
+        int estado = 0, linea = 1;
         String lexema = "";
         char c;
 
@@ -183,7 +183,7 @@ public class Scanner {
                         lexema = "";
                     } else if (!Character.isWhitespace(c)) {
                         // Caracter desconocido
-                        error(linea + 1, "Caracter no perteneciente al lenguaje");
+                        error(linea, "Caracter no perteneciente al lenguaje");
                     }
                     break;
 
@@ -299,6 +299,9 @@ public class Scanner {
                     if (Character.isDigit(c)) {
                         estado = 17;
                         lexema += c;
+                    }else {
+                        error(linea, "");
+                        i = source.length();
                     }
                     break;
 
@@ -357,10 +360,10 @@ public class Scanner {
                         estado = 0;
                         lexema = "";
                     } else if (c == '\n') {
-                        error(linea + 1, "No se han cerrado las comillas");
+                        error(linea, "No se han cerrado las comillas");
                         i = source.length();
                     } else if (i == source.length() - 1) {
-                        error(linea + 1, "No se han cerrado las comillas");
+                        error(linea, "No se han cerrado las comillas");
                     } else {
                         estado = 24;
                         lexema += c;
@@ -418,6 +421,8 @@ public class Scanner {
                     break;
             }
         }
+
+        tokens.add(new Token(TipoToken.EOF, "", source.length()));
 
         return tokens;
     }

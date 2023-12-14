@@ -1,6 +1,7 @@
 package laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.TipoToken;
@@ -188,7 +189,19 @@ public class ASDR implements Parser{
             Expression inc = FOR_STMT_3();
             match(TipoToken.RIGHT_PAREN);
             Statement body = STATEMENT();
-            return new StmtLoopFor(init,con,inc,body);
+
+            if(inc != null)
+                body = new StmtBlock(Arrays.asList(body,new StmtExpression(inc)));
+
+            if(con == null)
+                con = new ExprLiteral(true);
+
+            body = new StmtLoop(con,body);
+
+            if(init != null)
+                body = new StmtBlock(Arrays.asList(init,body));
+
+            return body;
         } else {
             hayErrores = true;
             return null;
