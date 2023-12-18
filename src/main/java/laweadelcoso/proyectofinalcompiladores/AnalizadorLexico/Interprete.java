@@ -52,20 +52,15 @@ public class Interprete {
     }
 
     private static void ejecutarPrompt() throws IOException {
-        
-        // Configura la lectura desde la entrada estándar
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for (; ; ) {
-            
-            // Muestra un prompt y lee una línea de entrada
+        for(;;){
             System.out.print(">>> ");
             String linea = reader.readLine();
-            if (linea == null) break; // Presionar Ctrl + D para salir del prompt
-            ejecutar(linea);
-            existenErrores = false; // Restablece la bandera de errores
-            
+            if(linea == null) break; // Presionar Ctrl + D
+            ejecutar(linea + " ");
+            existenErrores = false;
         }
     }
 

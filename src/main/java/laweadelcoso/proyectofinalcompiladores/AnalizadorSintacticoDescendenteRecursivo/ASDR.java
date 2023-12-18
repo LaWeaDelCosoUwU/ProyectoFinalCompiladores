@@ -28,11 +28,11 @@ public class ASDR implements Parser{
         PROGRAM();
 
         if(preanalisis.getTipo() == TipoToken.EOF && !hayErrores){
-            System.out.println("No jala");
+            System.out.println("Si jala");
             return  true;
         }
         else
-            System.out.println("Si jala");
+            System.out.println("No jala");
 
         return false;
 
@@ -426,8 +426,8 @@ public class ASDR implements Parser{
             return null;
 
         if(preanalisis.getTipo() == TipoToken.EQUAL){
-            match(TipoToken.EQUAL);
             Token name = previous();
+            match(TipoToken.EQUAL);
             Expression val = EXPRESSION();
             return new ExprAssign(name,val);
         }
@@ -795,8 +795,8 @@ public class ASDR implements Parser{
             return null;
 
         if(preanalisis.getTipo() == TipoToken.IDENTIFIER) {
-            match(TipoToken.IDENTIFIER);
             Token name = previous();
+            match(TipoToken.IDENTIFIER);
             match(TipoToken.LEFT_PAREN);
             List<Token> params = PARAMETERS_OPC();
             match(TipoToken.RIGHT_PAREN);

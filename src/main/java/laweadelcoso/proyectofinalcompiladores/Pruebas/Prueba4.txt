@@ -1,0 +1,1 @@
+fun sumar(variable1, variable2){return variabl1 + variable2;}sumar(5,4);print "Fin";
