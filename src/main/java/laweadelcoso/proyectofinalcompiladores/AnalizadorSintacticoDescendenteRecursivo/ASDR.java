@@ -25,7 +25,7 @@ public class ASDR implements Parser{
     @Override
     public boolean parse() {
 
-        PROGRAM();
+        List<Statement> arbol = PROGRAM();
 
         if(preanalisis.getTipo() == TipoToken.EOF && !hayErrores){
             System.out.println("Si jala");
@@ -463,7 +463,7 @@ public class ASDR implements Parser{
             Token operator = previous();
             Expression expr2 = LOGIC_AND();
             ExprLogical exprLogical = new ExprLogical(expr,operator,expr2);
-            LOGIC_OR_2(exprLogical);
+            return LOGIC_OR_2(exprLogical);
         }
 
         return expr;
@@ -496,7 +496,7 @@ public class ASDR implements Parser{
             Token operator = previous();
             Expression expr2 = EQUALITY();
             ExprLogical exprLogical = new ExprLogical(expr,operator,expr2);
-            LOGIC_AND_2(exprLogical);
+            return LOGIC_AND_2(exprLogical);
         }
 
         return expr;
@@ -578,25 +578,25 @@ public class ASDR implements Parser{
             operator = previous();
             expr2 = TERM();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            COMPARISON_2(exprBinary);
+            return COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.GREATER_EQUAL){
             match(TipoToken.GREATER_EQUAL);
             operator = previous();
             expr2 = TERM();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            COMPARISON_2(exprBinary);
+            return COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.LESS){
             match(TipoToken.LESS);
             operator = previous();
             expr2 = TERM();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            COMPARISON_2(exprBinary);
+            return COMPARISON_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.LESS_EQUAL){
             match(TipoToken.LESS_EQUAL);
             operator = previous();
             expr2 = TERM();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            COMPARISON_2(exprBinary);
+            return COMPARISON_2(exprBinary);
         }
 
         return expr;
@@ -634,13 +634,13 @@ public class ASDR implements Parser{
             operator = previous();
             expr2 = FACTOR();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            TERM_2(exprBinary);
+            return TERM_2(exprBinary);
         } else if(preanalisis.getTipo() == TipoToken.PLUS){
             match(TipoToken.PLUS);
             operator = previous();
             expr2 = FACTOR();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            TERM_2(exprBinary);
+            return TERM_2(exprBinary);
         }
 
         return expr;
@@ -678,13 +678,13 @@ public class ASDR implements Parser{
             operator = previous();
             expr2 = UNARY();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            FACTOR_2(exprBinary);
+            return FACTOR_2(exprBinary);
         } else if (preanalisis.getTipo() == TipoToken.STAR) {
             match(TipoToken.STAR);
             operator = previous();
             expr2 = UNARY();
             exprBinary = new ExprBinary(expr,operator,expr2);
-            FACTOR_2(exprBinary);
+            return FACTOR_2(exprBinary);
         }
 
         return expr;
@@ -743,7 +743,7 @@ public class ASDR implements Parser{
             match(TipoToken.LEFT_PAREN);
             List<Expression> args = ARGUMENTS_OPC();
             match(TipoToken.RIGHT_PAREN);
-            CALL_2(new ExprCallFunction(expr, args));
+            return CALL_2(new ExprCallFunction(expr, args));
         }
 
         return expr;
@@ -795,8 +795,8 @@ public class ASDR implements Parser{
             return null;
 
         if(preanalisis.getTipo() == TipoToken.IDENTIFIER) {
-            Token name = previous();
             match(TipoToken.IDENTIFIER);
+            Token name = previous(); //Esto estaba al revés
             match(TipoToken.LEFT_PAREN);
             List<Token> params = PARAMETERS_OPC();
             match(TipoToken.RIGHT_PAREN);
