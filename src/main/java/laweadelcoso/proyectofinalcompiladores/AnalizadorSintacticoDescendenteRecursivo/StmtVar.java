@@ -24,7 +24,7 @@ public class StmtVar extends Statement {
     public void execute(TablaSimbolos tablasimbolos) {
 
         if(tablasimbolos.existeIdentificador(name.getLexema())){
-            throw new RuntimeException();
+            throw new RuntimeException("Ya Existe");
         }else if(initializer == null){
             tablasimbolos.asignar(name.getLexema(),null);
         }else{

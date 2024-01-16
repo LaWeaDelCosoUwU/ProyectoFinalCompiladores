@@ -26,11 +26,16 @@ public class StmtIf extends Statement {
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
 
-        if((Boolean) condition.resolver(tablasimbolos)){
-            thenBranch.execute(tablasimbolos);
-        }else if(elseBranch != null){
-            elseBranch.execute(tablasimbolos);
-        }
+        Object conditionResuelta = condition.resolver(tablasimbolos);
+
+        if(conditionResuelta instanceof Boolean){
+            if((Boolean) conditionResuelta){
+                thenBranch.execute(tablasimbolos);
+            }else if(elseBranch != null){
+                elseBranch.execute(tablasimbolos);
+            }
+        }else
+            throw new RuntimeException("La condición debe ser booleana");
 
     }
 

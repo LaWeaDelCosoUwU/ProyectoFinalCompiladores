@@ -33,16 +33,21 @@ public class ExprBinary extends Expression{
         Object leftResuelto = left.resolver(tablasimbolos);
         Object rightResuelto = right.resolver(tablasimbolos);
 
-        return switch (operator.getLexema()) {
-            case "+" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "suma");
-            case "-" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "resta");
-            case "==" -> esIgual(leftResuelto, rightResuelto);
-            case "!=" -> !esIgual(leftResuelto, rightResuelto);
-            case "*" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "multiplicación");
-            case "/" -> hacerOperacionDivision(leftResuelto, rightResuelto);
-            case "<", ">", "<=", ">=" -> hacerComparasion(leftResuelto, rightResuelto, operator.getLexema());
-            default -> throw new RuntimeException();
-        };
+
+
+            return switch (operator.getLexema()) {
+                case "+" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "suma");
+                case "-" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "resta");
+                case "==" -> esIgual(leftResuelto, rightResuelto);
+                case "!=" -> !esIgual(leftResuelto, rightResuelto);
+                case "*" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "multiplicación");
+                case "/" -> hacerOperacionDivision(leftResuelto, rightResuelto);
+                case "<", ">", "<=", ">=" -> hacerComparasion(leftResuelto, rightResuelto, operator.getLexema());
+                default -> throw new RuntimeException();
+            };
+
+
+
     }
 
     private boolean esIgual(Object leftResuelto, Object rightResuelto) {
@@ -66,7 +71,7 @@ public class ExprBinary extends Expression{
                 throw new RuntimeException();
             }
         } else {
-            throw new RuntimeException();
+            throw new RuntimeException("Error de division");
         }
     }
 
@@ -83,14 +88,20 @@ public class ExprBinary extends Expression{
             };
             return resultado;
         } else {
-            throw new RuntimeException();
+            throw new RuntimeException("Error de operacion aritmetica");
         }
     }
 
     //Está generalizada para todo aquello que se pueda comparar, no se si funcione bien
     //jaja se pinta de verde arriba porque puse "todo"
     private boolean hacerComparasion(Object leftResuelto, Object rightResuelto, String operador) {
-        if (left instanceof Comparable<?> && right instanceof Comparable<?>) {
+
+        if (leftResuelto instanceof Number && rightResuelto instanceof Number) {
+            leftResuelto = ((Number) leftResuelto).doubleValue();
+            rightResuelto = ((Number) rightResuelto).doubleValue();
+        }
+
+        if (leftResuelto instanceof Comparable<?> && rightResuelto instanceof Comparable<?>) {
             @SuppressWarnings("unchecked")
             Comparable<Object> comparableLeftResuelto = (Comparable<Object>) leftResuelto;
             return switch (operador) {
@@ -100,8 +111,9 @@ public class ExprBinary extends Expression{
                 case ">=" -> comparableLeftResuelto.compareTo(rightResuelto) >= 0;
                 default -> false;
             };
+
         } else {
-            throw new RuntimeException();
+            throw new RuntimeException("Error de comparacion");
         }
     }
 

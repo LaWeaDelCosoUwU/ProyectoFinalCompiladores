@@ -20,9 +20,13 @@ public class StmtLoop extends Statement {
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
 
-        while((Boolean) condition.resolver(tablasimbolos)){
-            body.execute(tablasimbolos);
-        }
+        if(condition.resolver(tablasimbolos) instanceof Boolean){
+            while((Boolean) condition.resolver(tablasimbolos)){
+                body.execute(tablasimbolos);
+                condition.resolver(tablasimbolos);
+            }
+        }else
+            throw new RuntimeException("La condición debe ser booleana");
 
     }
 

@@ -1,1 +1,6 @@
-if(a < b){print "Válido";}print "Fin";
+// Prueba 2:
+if(a < b){
+    print "Válido";
+}
+
+print "Fin";

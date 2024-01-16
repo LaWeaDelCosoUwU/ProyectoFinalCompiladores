@@ -15,6 +15,7 @@ class ExprVariable extends Expression {
 
     @Override
     public Object resolver(TablaSimbolos tablasimbolos) {
+        System.out.println(name.getLexema() +""+tablasimbolos.obtener(name.getLexema()));
         return tablasimbolos.obtener(name.getLexema());
     }
 

@@ -13,15 +13,7 @@ class ExprLiteral extends Expression {
 
     @Override
     public Object resolver(TablaSimbolos tablasimbolos) {
-        if(value instanceof Number){
-            return ((Number)value).doubleValue();
-        }else if (value instanceof Boolean){
-            return (Boolean) value;
-        }else if(value == null){
-            return null;
-        }else{
-            throw new RuntimeException();
-        }
+        return value;
     }
 
 }

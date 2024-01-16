@@ -1,1 +1,72 @@
 Aquí voy a anotar cómo me van saliendo mis pruebas
+
+Prueba 1:
+    Intento 1 (Prueba1.txt): java.lang.RuntimeException
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprLiteral.resolver(ExprLiteral.java:23)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.StmtVar.execute(StmtVar.java:31)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.analizar(AnalizadorSemantico.java:18)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.<init>(AnalizadorSemantico.java:13)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutar(Interprete.java:86)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutarPrompt(Interprete.java:63)
+               	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.main(Interprete.java:38)
+    Este fue por lo que me dijo el profe, no necesitaba tanto en expresión literal, al fin y al cabo el tipo de retorno es object
+    Intento: 2: Dio error en operación binaria, porque no contemplo lo de la concatenación de cadenas, oí decir al profe que podíamos decir que es de hecho un error, así que eso
+    en este lenguaje la concatenación no se puede.
+
+*Empezaré a añadir mensajes de error, aunque sé exactamente donde está localizado por consola, es más legible si solo tiro el mensaje de lo que es y ya*
+
+Prueba 2: Inserté un  print "awa"; para probar si debía hacer un substring del literal, pero nope.
+
+Prueba 4: Inserté un var x = 1; print x; y si me imprimió el 1. (Programa hacer lo que programador quiere, programador feliz)
+
+Prueba 5:
+    Intento 1 (Prueba2.txt): java.lang.RuntimeException: Variable no definida 'a'.
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.TablaSimbolos.obtener(TablaSimbolos.java:20)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprVariable.resolver(ExprVariable.java:18)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprBinary.resolver(ExprBinary.java:33)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.StmtIf.execute(StmtIf.java:29)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.analizar(AnalizadorSemantico.java:18)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.<init>(AnalizadorSemantico.java:13)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutar(Interprete.java:86)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutarPrompt(Interprete.java:63)
+                             	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.main(Interprete.java:38)
+    Intento 2 (declaré las variables y les di valor, en este caso, a es mayor): java.lang.RuntimeException: Error de comparacion
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprBinary.hacerComparasion(ExprBinary.java:104)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprBinary.resolver(ExprBinary.java:43)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.StmtIf.execute(StmtIf.java:29)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.analizar(AnalizadorSemantico.java:18)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.<init>(AnalizadorSemantico.java:13)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutar(Interprete.java:86)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutarPrompt(Interprete.java:63)
+                                                                                	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.main(Interprete.java:38)
+        Intento 2.1 Estaba usando las variables de instancia en vez de las que le pasé al la función jaja, ya está corregido y el intento fue satisfactorio.
+    Intento 3 (Lo mismo que el 2 pero ahora B es mayor): Intento satisfactorio.
+
+Prueba 6 (Prueba3.txt):
+    Intento 1: Se repitió la situación anterior, variables no declaradas
+    Intento 2 (Variables declaradas y a es mayor): Imprimió "No Valido" prueba exitosa
+    Intento 3 (Lo mismo que el dos, pero ahora b es mayor): Imprimió "Valido" prueba exitosa
+
+Prueba 7 (Prueba4.txt):
+    Intento 1: Imprimió Fin, considerando que no voy a hacer lo de las funciones, es una prueba satisfactoria
+
+Prueba 8 (Prueba5.txt):
+    Intento 1: EMPEZO A IMPRIMIR UN MONTÓN DE CEROS! (resultado satisfactorio, pero si me sacó de onda)
+
+Prueba 9 (Prueba7.txt):
+    Intento 1: Me dijo que no jala, es por el espacio en lo que debería ser un >=
+    Intento 2 (Quité el espacio): java.lang.ClassCastException: class java.lang.Integer cannot be cast to class java.lang.Double (java.lang.Integer and java.lang.Double are in module java.base of loader 'bootstrap')
+                                  	at java.base/java.lang.Double.compareTo(Double.java:216)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprBinary.hacerComparasion(ExprBinary.java:100)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprBinary.resolver(ExprBinary.java:43)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ExprLogical.resolver(ExprLogical.java:20)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.StmtIf.execute(StmtIf.java:29)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.analizar(AnalizadorSemantico.java:18)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico.<init>(AnalizadorSemantico.java:13)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutar(Interprete.java:86)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.ejecutarPrompt(Interprete.java:63)
+                                  	at laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Interprete.main(Interprete.java:38)
+    Intento 3 (el error anterior salía porque no era posible comparar un integer (100) con un double (78.54100)
+        así que apliqué una corrección que hace que todos sean double y entonces sea posible compararlos): La prueba fue satisfactoria
+
+Prueba 10 (Prueba8.txt): Prueba exitosa
