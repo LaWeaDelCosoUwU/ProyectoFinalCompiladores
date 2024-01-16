@@ -13,7 +13,7 @@ public class StmtPrint extends Statement {
 
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
-
+        System.out.println(expression.resolver(tablasimbolos));
     }
 
 }

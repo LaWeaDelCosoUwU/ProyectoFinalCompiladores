@@ -13,6 +13,7 @@ public class ExprGrouping extends Expression {
 
     @Override
     public Object resolver(TablaSimbolos tablasimbolos) {
+        expression.resolver(tablasimbolos);
         return null;
     }
 

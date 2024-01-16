@@ -13,7 +13,7 @@ public class StmtExpression extends Statement {
 
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
-
+        expression.resolver(tablasimbolos);
     }
 
 }

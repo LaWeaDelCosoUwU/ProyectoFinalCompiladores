@@ -7,16 +7,15 @@ import laweadelcoso.proyectofinalcompiladores.AnalizadorLexico.Token;
 public class AnalizadorSemantico{
 
     private final TablaSimbolos tablaSimbolosPrincipal = new TablaSimbolos();
-    private boolean hayErroresSemanticos = false;
+    //private boolean hayErroresSemanticos = false; iba a haber un metodo para lo de los errores, pero pues ya no hubo
 
     public AnalizadorSemantico(List<Statement> arbol) {
         analizar(arbol);
     }
 
     private void analizar(List<Statement> statements) {
-        for (Statement statement : statements) {
+        for (Statement statement : statements)
             statement.execute(tablaSimbolosPrincipal);
-        }
     }
 
 }

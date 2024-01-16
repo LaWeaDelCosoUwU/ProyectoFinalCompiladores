@@ -29,7 +29,7 @@ public class StmtFunction extends Statement {
 
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
-
+//      Se ve feo esto, a ver si me da tiempo al rato, prefiero que quede el resto mejor, a que las cosas queden medio feas por meterme con funciones
     }
 
 }

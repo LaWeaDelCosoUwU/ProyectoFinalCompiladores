@@ -36,11 +36,25 @@ public class ExprBinary extends Expression{
         return switch (operator.getLexema()) {
             case "+" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "suma");
             case "-" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "resta");
+            case "==" -> esIgual(leftResuelto, rightResuelto);
+            case "!=" -> !esIgual(leftResuelto, rightResuelto);
             case "*" -> hacerOperacionAritmetica(leftResuelto, rightResuelto, "multiplicación");
             case "/" -> hacerOperacionDivision(leftResuelto, rightResuelto);
             case "<", ">", "<=", ">=" -> hacerComparasion(leftResuelto, rightResuelto, operator.getLexema());
             default -> throw new RuntimeException();
         };
+    }
+
+    private boolean esIgual(Object leftResuelto, Object rightResuelto) {
+        if(leftResuelto instanceof Number && rightResuelto instanceof Number){
+            return ((Number) leftResuelto).doubleValue() == ((Number) rightResuelto).doubleValue();
+        }else if (leftResuelto instanceof String && rightResuelto instanceof String){
+            return leftResuelto.equals(rightResuelto);
+        }else if (leftResuelto instanceof Boolean && rightResuelto instanceof Boolean){
+            return (Boolean) leftResuelto == (Boolean) rightResuelto;
+        }else{
+            throw new RuntimeException();
+        }
     }
 
     private Number hacerOperacionDivision(Object leftResuelto, Object rightResuelto) {

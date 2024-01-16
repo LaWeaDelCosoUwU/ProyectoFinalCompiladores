@@ -12,6 +12,7 @@ public class ASDR implements Parser{
     private int i = 0;
     private Token preanalisis;
     private final List<Token> tokens;
+    private List<Statement> arbol = new ArrayList<>();
     private boolean hayErrores = false;
 
     public ASDR(List<Token> tokens){
@@ -21,11 +22,15 @@ public class ASDR implements Parser{
 
     }
 
+    public List<Statement> getArbol() {
+        return arbol;
+    }
+
     //Gramatica
     @Override
     public boolean parse() {
 
-        List<Statement> arbol = PROGRAM();
+        arbol = PROGRAM();
 
         if(preanalisis.getTipo() == TipoToken.EOF && !hayErrores){
             System.out.println("Si jala");

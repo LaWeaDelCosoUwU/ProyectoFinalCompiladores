@@ -23,6 +23,7 @@ public class ExprCallFunction extends Expression{
 
     @Override
     public Object resolver(TablaSimbolos tablasimbolos) {
+        //Esto es de function y ya hice mi statement acerca de eso
         return null;
     }
 

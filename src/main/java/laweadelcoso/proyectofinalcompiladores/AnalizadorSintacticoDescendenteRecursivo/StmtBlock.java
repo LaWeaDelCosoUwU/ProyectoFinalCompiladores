@@ -15,7 +15,8 @@ public class StmtBlock extends Statement{
 
     @Override
     public void execute(TablaSimbolos tablasimbolos) {
-
+        for (Statement statement : statements)
+            statement.execute(tablasimbolos);
     }
 
 }

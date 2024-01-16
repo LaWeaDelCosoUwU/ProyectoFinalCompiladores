@@ -1,6 +1,7 @@
 package laweadelcoso.proyectofinalcompiladores.AnalizadorLexico;
 
 import laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.ASDR;
+import laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo.AnalizadorSemantico;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,14 +73,19 @@ public class Interprete {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.scan();
 
-            // Imprime cada token en la consola
+            /* Imprime cada token en la consola
             for (Token token : tokens) {
                 System.out.println(token);
-            }
+            }*/
 
             //El analizador sintactico
             ASDR asdr = new ASDR(tokens);
-            asdr.parse();
+
+            //Analisis sintactico
+            if(asdr.parse()){
+                new AnalizadorSemantico(asdr.getArbol());
+            }
+
             
         } catch (Exception ex) {
             ex.printStackTrace(); // Imprime la traza de la excepción en caso de error
