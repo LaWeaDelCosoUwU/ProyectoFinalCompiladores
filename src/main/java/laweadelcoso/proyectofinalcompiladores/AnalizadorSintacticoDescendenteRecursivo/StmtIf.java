@@ -10,4 +10,22 @@ public class StmtIf extends Statement {
         this.thenBranch = thenBranch;
         this.elseBranch = elseBranch;
     }
+
+    public Expression getCondition() {
+        return condition;
+    }
+
+    public Statement getThenBranch() {
+        return thenBranch;
+    }
+
+    public Statement getElseBranch() {
+        return elseBranch;
+    }
+
+    @Override
+    public void execute(TablaSimbolos tablasimbolos) {
+
+    }
+
 }

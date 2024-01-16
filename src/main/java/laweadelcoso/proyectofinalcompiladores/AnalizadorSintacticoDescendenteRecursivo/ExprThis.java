@@ -1,9 +1,0 @@
-package laweadelcoso.proyectofinalcompiladores.AnalizadorSintacticoDescendenteRecursivo;
-
-public class ExprThis extends Expression{
-    // final Token keyword;
-
-    ExprThis() {
-        // this.keyword = keyword;
-    }
-}

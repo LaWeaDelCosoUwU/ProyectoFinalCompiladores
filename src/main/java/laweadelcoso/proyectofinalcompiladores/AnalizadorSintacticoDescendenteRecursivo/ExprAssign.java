@@ -10,4 +10,24 @@ public class ExprAssign extends Expression{
         this.name = name;
         this.value = value;
     }
+
+    public Token getName() {
+        return name;
+    }
+
+    public Expression getValue() {
+        return value;
+    }
+
+    @Override
+    public Object resolver(TablaSimbolos tablasimbolos) {
+
+        if (tablasimbolos.existeIdentificador(name.getLexema())){
+            tablasimbolos.asignar(name.getLexema(), value.resolver(tablasimbolos));
+        } else{
+            throw new RuntimeException();
+        }
+
+        return null;
+    }
 }

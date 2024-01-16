@@ -6,4 +6,14 @@ public class ExprGrouping extends Expression {
     ExprGrouping(Expression expression) {
         this.expression = expression;
     }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    @Override
+    public Object resolver(TablaSimbolos tablasimbolos) {
+        return null;
+    }
+
 }

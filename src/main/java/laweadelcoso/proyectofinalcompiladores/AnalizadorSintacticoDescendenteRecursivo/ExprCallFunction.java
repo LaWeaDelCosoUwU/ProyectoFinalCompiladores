@@ -12,4 +12,18 @@ public class ExprCallFunction extends Expression{
         // this.paren = paren;
         this.arguments = arguments;
     }
+
+    public Expression getCallee() {
+        return callee;
+    }
+
+    public List<Expression> getArguments() {
+        return arguments;
+    }
+
+    @Override
+    public Object resolver(TablaSimbolos tablasimbolos) {
+        return null;
+    }
+
 }

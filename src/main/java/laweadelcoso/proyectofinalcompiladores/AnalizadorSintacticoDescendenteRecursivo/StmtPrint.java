@@ -6,4 +6,14 @@ public class StmtPrint extends Statement {
     StmtPrint(Expression expression) {
         this.expression = expression;
     }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    @Override
+    public void execute(TablaSimbolos tablasimbolos) {
+
+    }
+
 }
