@@ -45,21 +45,15 @@ public class ExprLogical extends Expression{
     private boolean hacerAND(Object leftResuelto, Object rightResuelto) {
         if (leftResuelto instanceof Boolean && rightResuelto instanceof Boolean){
             return (Boolean) leftResuelto && (Boolean) rightResuelto;
-        }else{
-            System.err.println("No se puede");
-            System.exit(1);
-            return false;
-        }
+        }else
+            throw new RuntimeException("No son booleanas");
     }
 
     private boolean hacerOR(Object leftResuelto, Object rightResuelto) {
         if (leftResuelto instanceof Boolean && rightResuelto instanceof Boolean){
             return (Boolean) leftResuelto || (Boolean) rightResuelto;
-        }else{
-            System.err.println("No se puede");
-            System.exit(1);
-            return false;
-        }
+        }else
+            throw new RuntimeException("No son booleanas");
     }
 
 }

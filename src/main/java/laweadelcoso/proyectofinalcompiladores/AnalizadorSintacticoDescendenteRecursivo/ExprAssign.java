@@ -25,7 +25,7 @@ public class ExprAssign extends Expression{
         if (tablasimbolos.existeIdentificador(name.getLexema())){
             tablasimbolos.asignar(name.getLexema(), value.resolver(tablasimbolos));
         } else{
-            throw new RuntimeException();
+            throw new RuntimeException("Variable no declarada");
         }
 
         return null;
